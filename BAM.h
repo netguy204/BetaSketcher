@@ -11,6 +11,12 @@
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
+  
+  This is a Arduino Library that implements Binary Angle Modulation (BAM).
+  You can learn more about BAM here: http://www.batsocks.co.uk/readme/art_bcm_3.htm
+  
+  The initial release of this library assumes it is communicating with a
+  MAX 7219 via SPI.
 */
 
 #ifndef BAM_H
