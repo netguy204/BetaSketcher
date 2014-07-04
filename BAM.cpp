@@ -53,7 +53,7 @@ void initLED() {
   ledTransfer(OP_SCANLIMIT, 7);
   ledTransfer(OP_DECODEMODE, 0);
   ledTransfer(OP_SHUTDOWN, 1);
-  ledTransfer(OP_INTENSITY, 1);
+  ledTransfer(OP_INTENSITY, 0);
 }
 
 namespace BAMNamespace {
