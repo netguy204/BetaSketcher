@@ -11,7 +11,7 @@ BAMNamespace::BAMClass BAM;
 #define LED_CLK 11
 #define LED_ENABLE 12
 
-prog_uint8_t CIEL8[] PROGMEM = {
+const uint8_t CIEL8[] PROGMEM = {
     0, 15, 31, 63, 70, 100, 127, 255
 };
 
