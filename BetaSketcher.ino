@@ -73,7 +73,7 @@ void loop() {
   }
   
   // clear the screen on significant light change
-  if(abs(light_neutral - analogRead(LIGHT)) > light_neutral / 2) {
+  if(light_neutral - analogRead(LIGHT) > light_neutral/2) {
     memset(screen, 0, sizeof(screen));
   }
   
