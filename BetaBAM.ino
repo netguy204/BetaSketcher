@@ -93,34 +93,25 @@ void setup() {
   memset((void*)frames, 0, sizeof(frames));
   initLED();
   
-  for(uint8_t row = 0; row < 8; ++row) {
-    for(uint8_t col = 0; col < 8; ++col) {
-      char dx = 3 - col;
-      char dy = 3 - row;
-      char d2 = dx*dx + dy*dy;
-      setOutput(row, col, CIELPWM(7-min(7,d2/2)));
-    }
-  }
-  
   tickpos = 0;
   
   noInterrupts();
-  TCCR0A = 0;
-  TCCR0B = 0;
-  TCNT0 = 0;
+  TCCR1A = 0;
+  TCCR1B = 0;
 
-  TCCR0A |= (1 << WGM01); // CTC
-  TCCR0B |= (1 << CS02) | (1 << CS01) | (1 << CS00); // 128 prescaler
-  TIMSK0 |= (1 << OCIE0A); // enable timer compare interrupt
+  TCCR1B |= (1 << WGM12); // CTC
+  TCCR1B |= (1 << CS12) | (1 << CS10); // 1024 prescaler
+  TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
+  TCNT1 = 0;
   interrupts();  
 }
 
 #define TRANSFER_ROW(n) ledTransfer(n+1, frames[tickpos].rows[n])
 
-ISR(TIMER0_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) {
   next_frame:
   tickpos = (tickpos + 1) & 7;
-  OCR0A = delays[tickpos];
+  OCR1A = delays[tickpos];
   
   //ledTransfer(OP_SHUTDOWN, 0);
   TRANSFER_ROW(0);
@@ -143,22 +134,46 @@ ISR(TIMER0_COMPA_vect) {
   }
   */
  
-  if(TCNT0 >= delays[tickpos]) {
-    TCNT0 -= delays[tickpos];
+  if(TCNT1 >= delays[tickpos]) {
+    TCNT1 -= delays[tickpos];
     goto next_frame;
   }
   
   //TCNT0 = 0;
 }
 
-void loop() {
-  for(char i = 0; i < 8; i++) {
-    for(char r = 0; r < 8; r++) {
-      char d = abs(i - r);
-      char i = 7 - d;
-      for(char c = 0; c < 8; c++) {
-        //setOutput(r, c, i);
-      }
+void drawBall(char cr, char cc) {   
+  for(uint8_t row = 0; row < 8; ++row) {
+    for(uint8_t col = 0; col < 8; ++col) {
+      int dx = cr - col*16;
+      int dy = cc - row*16;
+      int d2 = dx*dx + dy*dy;
+      setOutput(row, col, CIELPWM(7-min(7,d2/256)));
     }
   }
+}
+
+int ballx = 3;
+int bally = 4;
+int balldx = 3;
+int balldy = 5;
+
+void loop() {
+  long start = millis();
+  ballx += balldx;
+  bally += balldy;
+  
+  if(ballx >= 128 || ballx < 0) {
+    ballx = constrain(ballx, 0, 127);
+    balldx = -balldx;
+  }
+  if(bally >= 128 || bally < 0) {
+    bally = constrain(bally, 0, 127);
+    balldy = -balldy;
+  }
+  
+  drawBall(bally, ballx);
+  
+  long dt = millis() - start;
+  delay(max(0, 30 - dt));
 }
